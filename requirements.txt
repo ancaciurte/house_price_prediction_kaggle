@@ -1,0 +1,9 @@
+numpy
+pandas
+seaborn
+sklearn
+plotly
+xgboost
+lightgbm
+flask
+json_tricks
