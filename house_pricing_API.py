@@ -11,14 +11,15 @@ from json_tricks import dumps
 import sys
 
 
-def preprocess_type(input_json):
-    #convert categorical to numerical
-    input_df = pd.DataFrame(input_json)
+def preprocessing(df):
+     #convert categorical to numerical
     lb = LabelEncoder()
-    cat_variable = input_df.dtypes==object
-    cat_variable = input_df.columns[cat_variable].tolist()
-    input_df[cat_variable] = input_df[cat_variable].apply(lambda col: lb.fit_transform(col.astype(str)))
-    return input_df
+    cat_variable = df.dtypes==object
+    cat_variable = df.columns[cat_variable].tolist()
+    df[cat_variable] = df[cat_variable].apply(lambda col: lb.fit_transform(col.astype(str)))
+
+    return df   
+
 
 
 #load the model from disk
@@ -37,14 +38,14 @@ app = Flask(__name__)
 @app.route('/', methods=['POST'])
 def predict():
     try:
-        input = request.get_json()
-        input_df = preprocess_type(input)
+        input_json = request.get_json()
+        input_df =  preprocessing(pd.DataFrame(input_json))
     except Exception:
         print("Input exception: The received input is not in a valid json format!")
         return jsonify({})
    
   
-    preds = pd.DataFrame(lr.predict(input_df), columns=[['Predicted Price']])
+    preds = pd.DataFrame(gb.predict(input_df), columns=[['Predicted Price']])
     return dumps(preds.to_json(orient="index")) #jsonify(preds) #
 
 if __name__ == '__main__':
@@ -53,43 +54,21 @@ if __name__ == '__main__':
 
 
 
-
-
 '''
-#input json example
-[
-    { 
-        "bedrooms": 3,
-        "bathrooms": 1.5,
-        "sqft_living": 1340,
-        "sqft_lot": 7912,
-        "sqft_above":1340,
-        "sqft_basement": 0,
-        "floors": 1.5,
-        "waterfront": 0,
-        "view":0,
-        "yr_built": 1955,
-        "yr_renovated": 2005,
-        "city": "Shoreline",
-        "country": "USA",
-        "renewal_status": 1
-    },
-    {
-        "bedrooms": 3,
-        "bathrooms": 1.5,
-        "sqft_living": 1340,
-        "sqft_lot": 7912,
-        "sqft_above":1340,
-        "sqft_basement": 0,
-        "floors": 1.5,
-        "waterfront": 0,
-        "view":0,
-        "yr_built": 1955,
-        "yr_renovated": 2005,
-        "city": "Shoreline",
-        "country": "USA",
-        "renewal_status": 1
-    }
-]
-
+input_json = [{ 
+    'bathrooms': 2, 
+    'floor': 0.5, 
+    'rooms': 3, 
+    'surface': 78, 
+    'state': 'nou', 
+    'zone': 'Buna Ziua'
+},
+{
+    'bathrooms': 2, 
+    'floor': 0.5, 
+    'rooms': 3, 
+    'surface': 78, 
+    'state': 'renovat', 
+    'zone': 'Marasti'
+}]
 '''
