@@ -5,7 +5,7 @@ logs
 model*
 
 #others
-house-pricing_train _MLflow.ipynb
+#house-pricing_train _MLflow.ipynb
 mlruns/
 
 # Byte-compiled / optimized / DLL files
